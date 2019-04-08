@@ -225,7 +225,8 @@ _pyv_list_venvs()
 _pyv_venv_set_cur()
 {
     PYV_VENV_CUR="$1"
-    VIRTUAL_ENV="$1"
+    VIRTUAL_ENV="$PYV_VENVS_DIR/$1"
+    export VIRTUAL_ENV
 }
 
 _pyv_venv_load_default()
