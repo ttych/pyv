@@ -155,6 +155,10 @@ _pyv_dist_build_process()
     tar -xzf "$_pyv_dist_build__file" &&
         rm "$_pyv_dist_build__file"
     cd *
+    if [ "$(uname -sm)" = "Darwin x86_64" ]; then
+        export LDFLAGS="-L/usr/local/opt/openssl/lib"
+        export CPPFLAGS="-I/usr/local/opt/openssl/include"
+    fi
     ./configure --prefix "$PYV_DISTS_DIR/${PWD##*/}" &&
         make &&
         make install
