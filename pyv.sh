@@ -191,17 +191,17 @@ _pyv_python_env()
 {
     _pyv_python_env__cur=
     _pyv_python_env__version=
+    _pyv_python_env__dist=
     _pyv_python_env__name="$1"
-    if [ -n "$_pyv_python_env__name" ]; then
-        _pyv_python_env__path="${2:-$PYV_VENVS_DIR}/$_pyv_python_env__name"
-        if [ -d "$_pyv_python_env__path" ]; then
-            _pyv_python_env__version="`$_pyv_python_env__path/bin/python --version 2>&1`" ||
-                _pyv_python_env__version='undefined'
-             _pyv_python_env__version="${_pyv_python_env__version%% \(*}"
-        else
-            return 1
-        fi
-    fi
+    [ -n "$_pyv_python_env__name" ] || return 1
+
+    _pyv_python_env__path="${2:-$PYV_VENVS_DIR}/$_pyv_python_env__name"
+    [ -d "$_pyv_python_env__path" ] || return 1
+
+    _pyv_python_env__version="`$_pyv_python_env__path/bin/python --version 2>&1`" ||
+        _pyv_python_env__version='undefined'
+    _pyv_python_env__version="${_pyv_python_env__version%% \(*}"
+
     _pyv_python_env__dist="`readlink -e $_pyv_python_env__path/bin/python`"
     _pyv_python_env__dist="${_pyv_python_env__dist%/bin/python*}"
     if [ "$_pyv_python_env__dist" = "$_pyv_python_env__path" ]; then
@@ -318,10 +318,15 @@ _pyv_recreate()
 {
     _pyv_venv_get_or_cur "$1" || return 1
     _pyv_recreate="$_pyv_venv_get_or_cur"
+    _pyv_recreate__version="$2"
+    if [ -z "$_pyv_recreate__version" ]; then
+        _pyv_python_env "$_pyv_recreate" &&
+            _pyv_recreate__version="${_pyv_python_env__dist##*/}"
+    fi
     _pyv_recreate__create_cmd=_pyv_create
     _pyv_venv_is_current "$_pyv_recreate" && _pyv_recreate__create_cmd=_pyv_set_or_create_set
     _pyv_delete "$_pyv_recreate"
-    $_pyv_recreate__create_cmd "$_pyv_recreate"
+    $_pyv_recreate__create_cmd "$_pyv_recreate" "$_pyv_recreate__version"
 }
 
 _pyv_delete()
