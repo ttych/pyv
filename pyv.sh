@@ -502,7 +502,7 @@ _pyv()
             _pyv_venv "$@"
             _pyv__ret=$?
             ;;
-        l|list)
+        l|list|-l)
             _pyv_list
             _pyv__ret=$?
             ;;
@@ -541,7 +541,7 @@ _pyv()
             _pyv_create_set "$@"
             _pyv__ret=$?
             ;;
-        -h|help)
+        -h|h|--help|help)
             _pyv_help "$@"
             _pyv__ret=$?
             ;;
