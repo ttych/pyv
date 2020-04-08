@@ -233,6 +233,13 @@ _pyv_venv_set_cur()
     export VIRTUAL_ENV
 }
 
+_pyv_venv_unset_cur()
+{
+    PYV_VENV_CUR=
+    VIRTUAL_ENV=
+    export VIRTUAL_ENV
+}
+
 _pyv_venv_load_default()
 {
     _pyv_venv_load_default=`cat "$PYV_VENV_DEFAULT_FILE" 2>/dev/null`
@@ -413,7 +420,7 @@ _pyv_unset()
     [ -z "$_pyv_unset__short" ] && return 0
     _pyv_unset="$PYV_VENVS_DIR/$_pyv_unset__short"
     _pyv_remove_path "$_pyv_unset" &&
-        _pyv_venv_set_cur
+        _pyv_venv_unset_cur
 }
 
 _pyv_create_set()
