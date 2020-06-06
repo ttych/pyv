@@ -155,6 +155,10 @@ _pyv_dist_build_process()
     tar -xzf "$_pyv_dist_build__file" &&
         rm "$_pyv_dist_build__file"
     cd *
+    if [ "$(uname -sm)" = "Darwin x86_64" ]; then
+        export LDFLAGS="-L/usr/local/opt/openssl/lib"
+        export CPPFLAGS="-I/usr/local/opt/openssl/include"
+    fi
     ./configure --prefix "$PYV_DISTS_DIR/${PWD##*/}" &&
         make &&
         make install
@@ -187,17 +191,17 @@ _pyv_python_env()
 {
     _pyv_python_env__cur=
     _pyv_python_env__version=
+    _pyv_python_env__dist=
     _pyv_python_env__name="$1"
-    if [ -n "$_pyv_python_env__name" ]; then
-        _pyv_python_env__path="${2:-$PYV_VENVS_DIR}/$_pyv_python_env__name"
-        if [ -d "$_pyv_python_env__path" ]; then
-            _pyv_python_env__version="`$_pyv_python_env__path/bin/python --version 2>&1`" ||
-                _pyv_python_env__version='undefined'
-             _pyv_python_env__version="${_pyv_python_env__version%% \(*}"
-        else
-            return 1
-        fi
-    fi
+    [ -n "$_pyv_python_env__name" ] || return 1
+
+    _pyv_python_env__path="${2:-$PYV_VENVS_DIR}/$_pyv_python_env__name"
+    [ -d "$_pyv_python_env__path" ] || return 1
+
+    _pyv_python_env__version="`$_pyv_python_env__path/bin/python --version 2>&1`" ||
+        _pyv_python_env__version='undefined'
+    _pyv_python_env__version="${_pyv_python_env__version%% \(*}"
+
     if [[ $(uname -sm) == "Darwin x86_64" ]]; then
         _pyv_python_env__dist="`readlink -n $_pyv_python_env__path/bin/python`"
     else
@@ -230,6 +234,13 @@ _pyv_venv_set_cur()
 {
     PYV_VENV_CUR="$1"
     VIRTUAL_ENV="$PYV_VENVS_DIR/$1"
+    export VIRTUAL_ENV
+}
+
+_pyv_venv_unset_cur()
+{
+    PYV_VENV_CUR=
+    VIRTUAL_ENV=
     export VIRTUAL_ENV
 }
 
@@ -318,10 +329,15 @@ _pyv_recreate()
 {
     _pyv_venv_get_or_cur "$1" || return 1
     _pyv_recreate="$_pyv_venv_get_or_cur"
+    _pyv_recreate__version="$2"
+    if [ -z "$_pyv_recreate__version" ]; then
+        _pyv_python_env "$_pyv_recreate" &&
+            _pyv_recreate__version="${_pyv_python_env__dist##*/}"
+    fi
     _pyv_recreate__create_cmd=_pyv_create
     _pyv_venv_is_current "$_pyv_recreate" && _pyv_recreate__create_cmd=_pyv_set_or_create_set
     _pyv_delete "$_pyv_recreate"
-    $_pyv_recreate__create_cmd "$_pyv_recreate"
+    $_pyv_recreate__create_cmd "$_pyv_recreate" "$_pyv_recreate__version"
 }
 
 _pyv_delete()
@@ -408,7 +424,7 @@ _pyv_unset()
     [ -z "$_pyv_unset__short" ] && return 0
     _pyv_unset="$PYV_VENVS_DIR/$_pyv_unset__short"
     _pyv_remove_path "$_pyv_unset" &&
-        _pyv_venv_set_cur
+        _pyv_venv_unset_cur
 }
 
 _pyv_create_set()
@@ -497,7 +513,7 @@ _pyv()
             _pyv_venv "$@"
             _pyv__ret=$?
             ;;
-        l|list)
+        l|list|-l)
             _pyv_list
             _pyv__ret=$?
             ;;
@@ -536,7 +552,7 @@ _pyv()
             _pyv_create_set "$@"
             _pyv__ret=$?
             ;;
-        -h|help)
+        -h|h|--help|help)
             _pyv_help "$@"
             _pyv__ret=$?
             ;;
