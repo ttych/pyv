@@ -198,7 +198,11 @@ _pyv_python_env()
             return 1
         fi
     fi
-    _pyv_python_env__dist="`readlink -e $_pyv_python_env__path/bin/python`"
+    if [[ $(uname -sm) == "Darwin x86_64" ]]; then
+        _pyv_python_env__dist="`readlink -n $_pyv_python_env__path/bin/python`"
+    else
+        _pyv_python_env__dist="`readlink -e $_pyv_python_env__path/bin/python`"
+    fi
     _pyv_python_env__dist="${_pyv_python_env__dist%/bin/python*}"
     if [ "$_pyv_python_env__dist" = "$_pyv_python_env__path" ]; then
         [ "$_pyv_python_env__name" = "$PYV_DIST_CUR" ] && _pyv_python_env__cur=*
