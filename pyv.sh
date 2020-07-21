@@ -202,7 +202,7 @@ _pyv_python_env()
         _pyv_python_env__version='undefined'
     _pyv_python_env__version="${_pyv_python_env__version%% \(*}"
 
-    if [[ $(uname -sm) == "Darwin x86_64" ]]; then
+    if [ "$(uname -sm)" == "Darwin x86_64" ]; then
         _pyv_python_env__dist="`readlink -n $_pyv_python_env__path/bin/python`"
     else
         _pyv_python_env__dist="`readlink -e $_pyv_python_env__path/bin/python`"
