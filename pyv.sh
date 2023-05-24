@@ -101,11 +101,11 @@ _pyv_dist_exec()
     _pyv_dist_exec__dist="${1:-$PYV_DIST_CUR}"
     shift
     _pyv_dist_exec__path="$PATH"
-    _pyv_dist_exec__ld_path="$LD_LIBRARY_PATH"
+    # _pyv_dist_exec__ld_path="$LD_LIBRARY_PATH"
     if [ "$_pyv_dist_exec__dist" != 'from_path' ]; then
         _pyv_dist_exec__dist_p="$PYV_DISTS_DIR/$_pyv_dist_exec__dist"
         _pyv_dist_exec__path="$_pyv_dist_exec__dist_p/bin:$_pyv_dist_exec__path"
-        _pyv_dist_exec__ld_path="$_pyv_dist_exec__dist_p/lib:$_pyv_dist_exec__ld_path"
+        # _pyv_dist_exec__ld_path="$_pyv_dist_exec__dist_p/lib:$_pyv_dist_exec__ld_path"
         if [ ! -x "$_pyv_dist_exec__dist_p/bin/python" ]; then
             printf >&2 "python command is not available at $_pyv_dist_exec__dist_p/bin/python\n"
             return 1
@@ -113,7 +113,7 @@ _pyv_dist_exec()
     fi
 
     PATH="$_pyv_dist_exec__path"
-    LD_LIBRARY_PATH="$_pyv_dist_exec__ld_path"
+    # LD_LIBRARY_PATH="$_pyv_dist_exec__ld_path"
 
     eval "$@"
 )
@@ -360,12 +360,12 @@ _pyv_add_path()
         [ -d "$_pyv_add_path__d" ] &&
             PATH="$_pyv_add_path__d:$PATH"
     done
-    for _pyv_add_path__d in lib; do
-        _pyv_add_path__d="$_pyv_add_path/$_pyv_add_path__d"
-        [ -d "$_pyv_add_path__d" ] &&
-            LD_LIBRARY_PATH="$_pyv_add_path__d:$LD_LIBRARY_PATH"
-    done
-    export PATH LD_LIBRARY_PATH
+    # for _pyv_add_path__d in lib; do
+    #     _pyv_add_path__d="$_pyv_add_path/$_pyv_add_path__d"
+    #     [ -d "$_pyv_add_path__d" ] &&
+    #         LD_LIBRARY_PATH="$_pyv_add_path__d:$LD_LIBRARY_PATH"
+    # done
+    export PATH  # LD_LIBRARY_PATH
 }
 
 _pyv_remove_path()
@@ -382,18 +382,18 @@ _pyv_remove_path()
         [ -n "$_pyv_remove_path__back" ] &&
             PATH="${PATH:+$PATH:}$_pyv_remove_path__back"
     done
-    for _pyv_remove_path__d in lib; do
-        _pyv_remove_path__d="$_pyv_remove_path/$_pyv_remove_path__d"
-        _pyv_remove_path__front="${LD_LIBRARY_PATH%%$_pyv_remove_path__d*}"
-        _pyv_remove_path__back="${LD_LIBRARY_PATH#$_pyv_remove_path__front}"
-        _pyv_remove_path__back="${_pyv_remove_path__back#$_pyv_remove_path__d}"
-        _pyv_remove_path__front="${_pyv_remove_path__front%:}"
-        _pyv_remove_path__back="${_pyv_remove_path__back#:}"
-        LD_LIBRARY_PATH="$_pyv_remove_path__front"
-        [ -n "$_pyv_remove_path__back" ] &&
-            LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$_pyv_remove_path__back"
-    done
-    export PATH LD_LIBRARY_PATH
+    # for _pyv_remove_path__d in lib; do
+    #     _pyv_remove_path__d="$_pyv_remove_path/$_pyv_remove_path__d"
+    #     _pyv_remove_path__front="${LD_LIBRARY_PATH%%$_pyv_remove_path__d*}"
+    #     _pyv_remove_path__back="${LD_LIBRARY_PATH#$_pyv_remove_path__front}"
+    #     _pyv_remove_path__back="${_pyv_remove_path__back#$_pyv_remove_path__d}"
+    #     _pyv_remove_path__front="${_pyv_remove_path__front%:}"
+    #     _pyv_remove_path__back="${_pyv_remove_path__back#:}"
+    #     LD_LIBRARY_PATH="$_pyv_remove_path__front"
+    #     [ -n "$_pyv_remove_path__back" ] &&
+    #         LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$_pyv_remove_path__back"
+    # done
+    export PATH  # LD_LIBRARY_PATH
 }
 
 _pyv_set()
