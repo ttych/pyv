@@ -20,3 +20,27 @@ pyv is an utility to manage python distributions and related virtualenvs
  EasyAVR:Python 3.6.8:/home/thomas/local/pyv/venvs/EasyAVR
  test:Python 3.6.8:/home/thomas/local/pyv/venvs/test
 ```
+
+## Command
+
+### pyv link
+
+create venv ($1) symlink for the current or specified pyv venv ($2).
+
+usage is :  pyv link [venv target name] [pyv venv name]
+- venv target name, by default is *venv*
+- pyv venv name, by default is the current pyv virtualenv
+
+``` shell
+% pyv l
+[...]
+*test:[....]
+[...]
+% pyv link
+% ls -l
+venv -> /home/thomas/local/pyv/venvs/test
+% pyv link .env
+% ls -l
+.env -> /home/thomas/local/pyv/venvs/test
+venv -> /home/thomas/local/pyv/venvs/test
+```
