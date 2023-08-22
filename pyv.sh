@@ -11,6 +11,7 @@ PYV_VENV_DEFAULT_FILE="$PYV_DIR/default_virtualenv"
 # used/set by pyv later in the script
 #PYV_VENV_CUR=
 #PYV_DIST_CUR=from_path
+PYV_LINK_TARGET=venv
 
 PYTHON_DIST_URL='https://www.python.org/ftp/python/${version}/Python-${version}.tgz'
 
@@ -443,6 +444,19 @@ _pyv_set_or_create_set()
     _pyv_create_set "$_pyv_set_or_create_set__id" "$@"
 }
 
+_pyv_link()
+{
+    _pyv_target="${1:-$PYV_LINK_TARGET}"
+
+    _pyv_venv_get_or_cur "$2" || return 1
+    _pyv_link__short="$_pyv_venv_get_or_cur"
+    [ -z "$_pyv_link__short" ] && return 1
+
+    _pyv_link="$PYV_VENVS_DIR/$_pyv_link__short"
+
+    ln -sf "$_pyv_link" "$_pyv_target"
+}
+
 
 ### help
 
@@ -548,13 +562,18 @@ _pyv()
             _pyv_create_set "$@"
             _pyv__ret=$?
             ;;
-        -h|h|--help|help)
-            _pyv_help "$@"
-            _pyv__ret=$?
-            ;;
         sc|set_or_create)
             shift
             _pyv_set_or_create_set "$@"
+            _pyv__ret=$?
+            ;;
+        link)
+            shift
+            _pyv_link "$@"
+            _pyv__ret=$?
+            ;;
+        -h|h|--help|help)
+            _pyv_help "$@"
             _pyv__ret=$?
             ;;
         *)
