@@ -10,7 +10,6 @@ PYV_DIST_DEFAULT_FILE="$PYV_DIR/default_distribution"
 PYV_VENV_DEFAULT_FILE="$PYV_DIR/default_virtualenv"
 # used/set by pyv later in the script
 #PYV_VENV_CUR=
-#PYV_DIST_CUR=from_path
 PYV_LINK_TARGET=venv
 
 PYTHON_DIST_URL='https://www.python.org/ftp/python/${version}/Python-${version}.tgz'
@@ -75,15 +74,17 @@ _pyv_dist_list_from_path()
     _pyv_dist_list_from_path__version="`$_pyv_dist_list_from_path__python --version 2>&1`" ||
         _pyv_dist_list_from_path__version='undefined'
     cur=' '
-    [ "from_path" = "$PYV_DIST_CUR" ] && cur='*'
+    [ "from_path" = "$(_pyv_dist_default)" ] && cur='*'
     _pyv_print_python "from_path" "$_pyv_dist_list_from_path__version" \
                       "$_pyv_dist_list_from_path__path" "$cur"
 )
 
-_pyv_dist_load_default()
+_pyv_dist_default()
 {
-    PYV_DIST_CUR=`cat "$PYV_DIST_DEFAULT_FILE" 2>/dev/null`
-    PYV_DIST_CUR="${PYV_DIST_CUR:-from_path}"
+    _pyv_dist_default=`cat "$PYV_DIST_DEFAULT_FILE" 2>/dev/null`
+    _pyv_dist_default="${_pyv_dist_default:-from_path}"
+
+    echo "$_pyv_dist_default"
 }
 
 _pyv_dist_set_default()
@@ -94,12 +95,11 @@ _pyv_dist_set_default()
         [ -d "$PYV_DISTS_DIR/$1" ] || return 1
         echo "$1" > "$PYV_DIST_DEFAULT_FILE"
     fi
-    _pyv_dist_load_default
 }
 
 _pyv_dist_exec()
 (
-    _pyv_dist_exec__dist="${1:-$PYV_DIST_CUR}"
+    _pyv_dist_exec__dist="${1:-$(_pyv_dist_default)}"
     shift
     _pyv_dist_exec__path="$PATH"
     # _pyv_dist_exec__ld_path="$LD_LIBRARY_PATH"
@@ -121,7 +121,7 @@ _pyv_dist_exec()
 
 _pyv_dist_cur_exec()
 {
-    _pyv_dist_exec "$PYV_DIST_CUR" "$@"
+    _pyv_dist_exec "$(_pyv_dist_default)" "$@"
 }
 
 _pyv_dist_fix()
@@ -202,7 +202,7 @@ _pyv_python_env()
     _pyv_python_env__dist="`readlink -e $_pyv_python_env__path/bin/python`"
     _pyv_python_env__dist="${_pyv_python_env__dist%/bin/python*}"
     if [ "$_pyv_python_env__dist" = "$_pyv_python_env__path" ]; then
-        [ "$_pyv_python_env__name" = "$PYV_DIST_CUR" ] && _pyv_python_env__cur=*
+        [ "$_pyv_python_env__name" = "$(_pyv_dist_default)" ] && _pyv_python_env__cur=*
     else
         [ "$_pyv_python_env__name" = "$PYV_VENV_CUR" ] && _pyv_python_env__cur=*
     fi
@@ -291,8 +291,8 @@ _pyv_create()
     fi
     _pyv_create_venvs_dir || return 1
 
-    _pyv_dist_exec "${2:-$PYV_DIST_CUR}" "python -m venv --clear \"$_pyv_create\""
-    # _pyv_dist_exec "${2:-$PYV_DIST_CUR}" "pyvenv \"$_pyv_create\""
+    _pyv_dist_exec "${2:-$(_pyv_dist_default)}" "python -m venv --clear \"$_pyv_create\""
+    # _pyv_dist_exec "${2:-$(_pyv_dist_default)}" "pyvenv \"$_pyv_create\""
 
     _pyv_venv_fix "$_pyv_create"
 }
@@ -589,7 +589,6 @@ pyv()
     return $pyv
 }
 
-_pyv_dist_load_default
 _pyv_venv_load_default
 
 :
