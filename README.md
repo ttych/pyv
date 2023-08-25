@@ -44,3 +44,24 @@ venv -> /home/thomas/local/pyv/venvs/test
 .env -> /home/thomas/local/pyv/venvs/test
 venv -> /home/thomas/local/pyv/venvs/test
 ```
+
+## Special Variables
+
+### PYV_BUILD_OPENSSL
+
+during build process, you can force the openssl distribution to use,
+by setting the PYV_BUILD_OPENSSL variable.
+
+After a build of openssl:
+
+``` shell
+./config --prefix=/usr/local/openssl-1.1.1v --openssldir=/usr/local/openssl-1.1.1v/ssl
+make
+make install
+```
+
+You can use the custom openssl build with:
+
+``` shell
+PYV_BUILD_OPENSSL=/usr/local/openssl-1.1.1v pyv build 3.9.18
+```
