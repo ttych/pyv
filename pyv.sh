@@ -153,8 +153,9 @@ _pyv_dist_build_process()
         echo >&2 "      it will override build mechanism"
     fi
 
-    _pyv_dist_build_process__pkgs=
+    _pyv_dist_build_process__incs=
     _pyv_dist_build_process__libs=
+    _pyv_dist_build_process__pkgs=
     _pyv_dist_build_process__ssl=
 
     _pyv_dist_build_process__bifs="$IFS"
@@ -165,6 +166,8 @@ _pyv_dist_build_process()
             echo >&2 "WARN: $_pyv_dist_build_process__dist in PYV_BUILD_DISTS doest not exist"
             continue
         }
+
+        _pyv_dist_build_process__incs="${_pyv_dist_build_process__incs:+$_pyv_dist_build_process__incs:}$_pyv_dist_build_process__dist/include"
         _pyv_dist_build_process__libs="${_pyv_dist_build_process__libs:+$_pyv_dist_build_process__libs:}$_pyv_dist_build_process__dist/lib"
         _pyv_dist_build_process__pkgs="${_pyv_dist_build_process__pkgs:+$_pyv_dist_build_process__pkgs:}$_pyv_dist_build_process__dist/lib/pkgconfig"
 
@@ -175,6 +178,7 @@ _pyv_dist_build_process()
     IFS="$_pyv_dist_build_process__bifs"
 
     set -e
+
     version="$1"
     eval _pyv_dist_build__url="\"$PYTHON_DIST_URL\""
     _pyv_dist_build__file="${_pyv_dist_build__url##*/}"
@@ -192,7 +196,10 @@ _pyv_dist_build_process()
         export PKG_CONFIG_PATH="${_pyv_dist_build_process__pkgs}${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
     fi
 
-    ./configure --prefix "$PYV_DISTS_DIR/${PWD##*/}" ${_pyv_dist_build_process__ssl:+--with-openssl=$_pyv_dist_build_process__ssl} &&
+    PKG_CONFIG_PATH="${_pyv_dist_build_process__pkgs}${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" \
+                   CPPFLAGS="${_pyv_dist_build_process__incs}${CPPFLAGS:+:$CPPFLAGS}" \
+                   LDFLAGS="${_pyv_dist_build_process__libs}${LDFLAGS:+:$LDFLAGS}" \
+                   ./configure --prefix "$PYV_DISTS_DIR/${PWD##*/}" ${_pyv_dist_build_process__ssl:+--with-openssl=$_pyv_dist_build_process__ssl} &&
         make &&
         make install
     _pyv_dist_fix
