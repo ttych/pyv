@@ -167,10 +167,15 @@ _pyv_dist_build_process()
             continue
         }
 
-        _pyv_dist_build_process__incs="${_pyv_dist_build_process__incs:+$_pyv_dist_build_process__incs:}$_pyv_dist_build_process__dist/include"
-        _pyv_dist_build_process__libs="${_pyv_dist_build_process__libs:+$_pyv_dist_build_process__libs:}$_pyv_dist_build_process__dist/lib"
-        _pyv_dist_build_process__pkgs="${_pyv_dist_build_process__pkgs:+$_pyv_dist_build_process__pkgs:}$_pyv_dist_build_process__dist/lib/pkgconfig"
-
+        if [ -d "${_pyv_dist_build_process__dist}/include" ]; then
+            _pyv_dist_build_process__incs="${_pyv_dist_build_process__incs} -I${_pyv_dist_build_process__dist}/include"
+        fi
+        if [ -d "${_pyv_dist_build_process__dist}/lib" ]; then
+            _pyv_dist_build_process__libs="${_pyv_dist_build_process__libs} -Wl,-rpath=${_pyv_dist_build_process__dist}/lib"
+        fi
+        if [ -d "${_pyv_dist_build_process__dist}/lib/pkgconfig" ]; then
+            _pyv_dist_build_process__pkgs="${_pyv_dist_build_process__pkgs:+$_pyv_dist_build_process__pkgs:}$_pyv_dist_build_process__dist/lib/pkgconfig"
+        fi
         case $_pyv_dist_build_process__dist in
             *openssl*) _pyv_dist_build_process__ssl="$_pyv_dist_build_process__dist" ;;
         esac
@@ -188,13 +193,6 @@ _pyv_dist_build_process()
     cd *
 
     # LDFLAGS="${LDFLAGS} ${PYV_OPENSSL:+-Wl,-rpath=$PYV_OPENSSL/lib}"
-
-    if [ -n "$_pyv_dist_build_process__libs" ]; then
-        export LD_RUN_PATH="$_pyv_dist_build_process__libs}${LD_RUN_PATH:+:$LD_RUN_PATH}"
-    fi
-    if [ -n "$_pyv_dist_build_process__pkgs" ]; then
-        export PKG_CONFIG_PATH="${_pyv_dist_build_process__pkgs}${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
-    fi
 
     PKG_CONFIG_PATH="${_pyv_dist_build_process__pkgs}${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" \
                    CPPFLAGS="${_pyv_dist_build_process__incs}${CPPFLAGS:+:$CPPFLAGS}" \
