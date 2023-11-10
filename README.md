@@ -47,10 +47,12 @@ venv -> /home/thomas/local/pyv/venvs/test
 
 ## Special Variables
 
-### PYV_BUILD_OPENSSL
+### PYV_BUILD_DISTS
 
-during build process, you can force the openssl distribution to use,
-by setting the PYV_BUILD_OPENSSL variable.
+You can use custom distribution that can be used to build Python with.
+
+For example, during build process, you can force the openssl distribution to use,
+by setting the PYV_BUILD_DISTS variable.
 
 After a build of openssl:
 
@@ -63,5 +65,11 @@ make install
 You can use the custom openssl build with:
 
 ``` shell
-PYV_BUILD_OPENSSL=/usr/local/openssl-1.1.1v pyv build 3.9.18
+PYV_BUILD_DISTS=/usr/local/openssl-1.1.1v pyv build 3.9.18
+```
+
+To build with many specific distribution you can separate each custom lib with a ':' :
+
+``` shell
+PYV_BUILD_DISTS=/usr/local/openssl-1.1.1v:/custom/path/sqlite-3440000 pyv build 3.9.18
 ```
