@@ -148,6 +148,32 @@ _pyv_dist_build()
 
 _pyv_dist_build_process()
 (
+    if [ -n "$LDFLAGS" ]; then
+        echo >&2 "WARN: LDFLAGS is set to \"$LDFLAGS\""
+        echo >&2 "      it will override build mechanism"
+    fi
+
+    _pyv_dist_build_process__pkgs=
+    _pyv_dist_build_process__libs=
+    _pyv_dist_build_process__ssl=
+
+    _pyv_dist_build_process__bifs="$IFS"
+    IFS=":"
+    for _pyv_dist_build_process__dist in $PYV_BUILD_DISTS; do
+        [ -z "$_pyv_dist_build_process__dist" ] && continue
+        [ -d "$_pyv_dist_build_process__dist" ] || {
+            echo >&2 "WARN: $_pyv_dist_build_process__dist in PYV_BUILD_DISTS doest not exist"
+            continue
+        }
+        _pyv_dist_build_process__libs="${_pyv_dist_build_process__libs:+$_pyv_dist_build_process__libs:}$_pyv_dist_build_process__dist/lib"
+        _pyv_dist_build_process__pkgs="${_pyv_dist_build_process__pkgs:+$_pyv_dist_build_process__pkgs:}$_pyv_dist_build_process__dist/lib/pkgconfig"
+
+        case $_pyv_dist_build_process__dist in
+            *openssl*) _pyv_dist_build_process__ssl="$_pyv_dist_build_process__dist" ;;
+        esac
+    done
+    IFS="$_pyv_dist_build_process__bifs"
+
     set -e
     version="$1"
     eval _pyv_dist_build__url="\"$PYTHON_DIST_URL\""
@@ -156,7 +182,17 @@ _pyv_dist_build_process()
     tar -xzf "$_pyv_dist_build__file" &&
         rm "$_pyv_dist_build__file"
     cd *
-    LDFLAGS="${LDFLAGS} ${PYV_OPENSSL:+-Wl,-rpath=$PYV_OPENSSL/lib}" ./configure --prefix "$PYV_DISTS_DIR/${PWD##*/}" ${PYV_OPENSSL:+--with-openssl=$PYV_OPENSSL} &&
+
+    # LDFLAGS="${LDFLAGS} ${PYV_OPENSSL:+-Wl,-rpath=$PYV_OPENSSL/lib}"
+
+    if [ -n "$_pyv_dist_build_process__libs" ]; then
+        export LD_RUN_PATH="$_pyv_dist_build_process__libs}${LD_RUN_PATH:+:$LD_RUN_PATH}"
+    fi
+    if [ -n "$_pyv_dist_build_process__pkgs" ]; then
+        export PKG_CONFIG_PATH="${_pyv_dist_build_process__pkgs}${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+    fi
+
+    ./configure --prefix "$PYV_DISTS_DIR/${PWD##*/}" ${_pyv_dist_build_process__ssl:+--with-openssl=$_pyv_dist_build_process__ssl} &&
         make &&
         make install
     _pyv_dist_fix
