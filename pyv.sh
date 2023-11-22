@@ -240,7 +240,11 @@ _pyv_python_env()
         _pyv_python_env__version='undefined'
     _pyv_python_env__version="${_pyv_python_env__version%% \(*}"
 
-    _pyv_python_env__dist="`readlink -e $_pyv_python_env__path/bin/python`"
+    if [ "$(uname -sm)" == "Darwin x86_64" ]; then
+        _pyv_python_env__dist="`readlink -n $_pyv_python_env__path/bin/python`"
+    else
+        _pyv_python_env__dist="`readlink -e $_pyv_python_env__path/bin/python`"
+    fi
     _pyv_python_env__dist="${_pyv_python_env__dist%/bin/python*}"
     if [ "$_pyv_python_env__dist" = "$_pyv_python_env__path" ]; then
         [ "$_pyv_python_env__name" = "$(_pyv_dist_default)" ] && _pyv_python_env__cur=*
