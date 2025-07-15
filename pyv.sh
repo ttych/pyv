@@ -235,14 +235,15 @@ _pyv_python_env()
 
     _pyv_python_env__path="${2:-$PYV_VENVS_DIR}/$_pyv_python_env__name"
     [ -d "$_pyv_python_env__path" ] || return 1
+    _pyv_python_env__rpath=`readlink -e "$_pyv_python_env__path"`
 
     _pyv_python_env__version="`$_pyv_python_env__path/bin/python --version 2>&1`" ||
         _pyv_python_env__version='undefined'
     _pyv_python_env__version="${_pyv_python_env__version%% \(*}"
 
-    _pyv_python_env__dist="`readlink -e $_pyv_python_env__path/bin/python`"
+    _pyv_python_env__dist=`readlink -e "$_pyv_python_env__path/bin/python"`
     _pyv_python_env__dist="${_pyv_python_env__dist%/bin/python*}"
-    if [ "$_pyv_python_env__dist" = "$_pyv_python_env__path" ]; then
+    if [ "$_pyv_python_env__dist" = "$_pyv_python_env__path" ] || [ "$_pyv_python_env__dist" = "$_pyv_python_env__rpath" ]; then
         [ "$_pyv_python_env__name" = "$(_pyv_dist_default)" ] && _pyv_python_env__cur=*
     else
         [ "$_pyv_python_env__name" = "$PYV_VENV_CUR" ] && _pyv_python_env__cur=*
