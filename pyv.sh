@@ -10,7 +10,7 @@ PYV_DIST_DEFAULT_FILE="$PYV_DIR/default_distribution"
 PYV_VENV_DEFAULT_FILE="$PYV_DIR/default_virtualenv"
 # used/set by pyv later in the script
 #PYV_VENV_CUR=
-PYV_LINK_TARGET=venv
+PYV_LINK_TARGET=.venv
 
 PYTHON_DIST_URL='https://www.python.org/ftp/python/${version}/Python-${version}.tgz'
 
@@ -505,24 +505,25 @@ Usage is :
     pyv <action> <parameters>
 
 With distribution action in :
-    D | dist | dists                   : list distributions
-    D | dist | dists <version>         : set default distribution
-    fd | fix_dists                     : fix distributions
-    bd | build | build_dist <version>  : build specified version
-    dd | delete_dist <version>         : delete specified version
+    D | dist | dists                    : list distributions
+    D | dist | dists <version>          : set default distribution
+    fd | fix_dists                      : fix distributions
+    bd | build | build_dist <version>   : build specified version
+    dd | delete_dist <version>          : delete specified version
 
 With virtualenv action in :
-    v | venv | venvs                   : list virtual env
-    v | venv | venvs <virtualenv>      : set default virtual env
-    l | list                           : list distributions and virtualenv
-    i | info                           : display info for virtualenv
-    c | create <virtualenv>            : create virtualenv
-    rc | recreate <virtualenv>         : recreate virtualenv
-    d | delete <virtualenv>            : delete virtualenv
-    s | set <virtualenv>               : set virtualenv
-    u | unset <virtualenv>             : unset virtualenv
-    cs | create_set <virtualenv>       : create and set virtualenv
+    v | venv | venvs                    : list virtual env
+    v | venv | venvs <virtualenv>       : set default virtual env
+    l | list                            : list distributions and virtualenv
+    i | info                            : display info for virtualenv
+    c | create <virtualenv>             : create virtualenv
+    rc | recreate <virtualenv>          : recreate virtualenv
+    d | delete <virtualenv>             : delete virtualenv
+    s | set <virtualenv>                : set virtualenv
+    u | unset <virtualenv>              : unset virtualenv
+    cs | create_set <virtualenv>        : create and set virtualenv
     sc | set_or_create_set <virtualenv> : set or create and set virtualenv
+    link                                : link locally to $PYV_LINK_TARGET
 
 Default action is to :
     set_or_create_set <virtualenv>
